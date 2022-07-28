@@ -17,7 +17,7 @@ To run this application locally, navigate to the server.js file and open it in t
 ## Application Link
 
 Heroku App: https://gio2nice-note-taker.herokuapp.com/notes
-Github: 
+Github: https://github.com/gio2nice/Note-taker
 
 
 ## Contact
