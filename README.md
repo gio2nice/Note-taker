@@ -11,3 +11,15 @@ To run this application locally, navigate to the server.js file and open it in t
 
 <img width="1440" alt="Screen Shot 2022-07-28 at 3 24 54 PM" src="https://user-images.githubusercontent.com/106710271/181647542-1673acd2-296e-4df5-b231-657483c6cc39.png">
 
+<img width="1440" alt="Screen Shot 2022-07-28 at 3 25 03 PM" src="https://user-images.githubusercontent.com/106710271/181647753-6828b0f2-77c4-42a3-a1ff-b8edfe549e31.png">
+
+
+## Application Link
+
+Heroku App: https://gio2nice-note-taker.herokuapp.com/notes
+Github: 
+
+
+## Contact
+
+Email: gio2nice@uw.edu
