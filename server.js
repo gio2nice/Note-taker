@@ -1,14 +1,16 @@
 // Dependencies need to be installed 
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const util = require("util");
-const notes = require("./db/db.json");
-
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const { readFromFile, readAndAppend } = require('./fsUtils');
+const { v4: uuidv4 } = require('uuid');
+const { json } = require('express');
 
 // Server
 const app = express();
 const PORT = process.env.PORT || 3004
+
+
 
 
 // Urlencoded, built in middleware function in Express
@@ -17,65 +19,72 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
-
 // Adds static middleware
-app.use(express.static("./Develop/public"));
-
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
+app.use(express.static('public'));
 
 
 // "GET" request
-app.get("/api/notes", function(req, res) {
-    readFileAsync("./db/db.json", "utf-8").then(function(data) {
-        notes = [].concat(JSON.parse(data))
-        res.json(notes);
-    })
+app.get('/api/notes', (req, res) => {
+    console.log("In GET route.")
+    readFromFile(path.join(__dirname, "./db/db.json")).then((data) => {
+        console.log(data);
+        res.send(data)});
 });
 
 // "POST" request
-app.post("/api/notes", function(req, res) {
-    const note = req.body;
-    readFileAsync("./db/db.json", "utf-8").then(function(data) {
-        const notes = [].concat(JSON.parse(data));
-        note.id = notes.length + 1
-        notes.push(note);
-        return notes
-    }).then(function(notes) {
-        writeFileAsync("./db/db.json", JSON.stringify(notes))
-        res.json(note);
-    })
+app.post('/api/notes', (req, res) => {
+    console.log(req.body)
+    const { title, text } = req.body;
+
+    if (req.body) {
+        const newNote = {
+            title,
+            text,
+            id: uuidv4(),
+        };
+
+        readAndAppend(newNote, './db/db.json');
+        res.json("Succesfully added Note!!")
+    } else {
+        res.error('Adding note error...')
+    }
 });
 
 // "DELETE" request
-app.delete("./api/notes/:id", function(req, res) {
-    const idDelete = parseInt(req.params.id);
-    readFileAsync("/db/db.json", "utf-8").then(function(data) {
-        const notes = [].concat(JSON.parse(data));
+app.delete("/api/notes/:id", function(req, res) {
+    const idDelete = req.params.id;
+    fs.readFile("./db/db.json", (error, data) => {
+        if (error){
+            console.log(error)
+        }
+        const notes = JSON.parse(data);
         const newNotesData = []
         for (let i = 0; i<notes.length; i++) {
             if(idDelete !== notes[i].id) {
                 newNotesData.push(notes[i])
             }
         }
-        return newNotesData
-    }).then(function(notes) {
-        writeFileAsync("/Develop/db/db.json", JSON.stringify(notes))
-        res.send('successfully saved !!')
-    })
+        console.log(newNotesData);
+        fs.writeFile("./db/db.json", JSON.stringify(newNotesData), (error) => {
+            if (error){
+                console.log(error) 
+            }
+            res.send('successfully saved !!')
+        })
+    }) 
 })
 
 // HTML routes
-app.get("/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "/public/notes.html"));
+app.get('/notes', function(req, res) {
+    res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
-app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "/public/index.html"));
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
-app.get("*", function(req, res) {
-    res.sendFile(path.join(__dirname, "/public/index.html"));
+app.get('*', function(req, res) {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 
